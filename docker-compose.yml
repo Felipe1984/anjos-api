@@ -1,0 +1,35 @@
+version: '3'
+services:
+  anjos-db:
+    image: postgres:14
+    container_name: anjos-db
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_DATABASE=${PG_DB}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+    networks:
+      - anjos-network
+  anjos-app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: lipebritto/anjos-app
+    container_name: anjos-app
+    volumes:
+      - .:/usr/app
+    ports:
+      - 3333:3333
+    networks:
+      - anjos-network
+    depends_on:
+      - anjos-db
+
+networks:
+  anjos-network:
+    driver: bridge
